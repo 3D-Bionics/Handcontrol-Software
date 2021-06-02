@@ -3,7 +3,7 @@
 class hand:
     def __init__(self, positions: list = [0,0,0,0,0]):
         
-        if hand._checkPos(positions):
+        if hand.checkPos(positions):
             self._positions = positions
         else:
             raise "Wrong positional args in hand-object"
@@ -25,42 +25,42 @@ class hand:
 
     def setPos(self, positions : list) -> bool:
 
-        if not hand._checkPos(positions) :
+        if not hand.checkPos(positions) :
             return False
 
         self._positions = positions
         return True
 
     def setKlein(self, pos: int):
-        if not hand._checkPosInt(pos):
+        if not hand.checkPosInt(pos):
             return False
         
         self._positions[0] = pos
         return True
     
     def setRing(self, pos: int):
-        if not hand._checkPosInt(pos):
+        if not hand.checkPosInt(pos):
             return False
         
         self._positions[1] = pos
         return True
 
     def setMittel(self, pos: int):
-        if not hand._checkPosInt(pos):
+        if not hand.checkPosInt(pos):
             return False
         
         self._positions[2] = pos
         return True
 
     def setZeige(self, pos: int):
-        if not hand._checkPosInt(pos):
+        if not hand.checkPosInt(pos):
             return False
         
         self._positions[3] = pos
         return True
 
     def setDaumen(self, pos: int):
-        if not hand._checkPosInt(pos):
+        if not hand.checkPosInt(pos):
             return False
         
         self._positions[4] = pos
@@ -68,7 +68,7 @@ class hand:
 
     
     @staticmethod
-    def _checkPos(positions: list) -> bool:
+    def checkPos(positions: list) -> bool:
         if len(positions) != 5:
             return False
 
@@ -79,7 +79,7 @@ class hand:
         return True
 
     @staticmethod
-    def _checkPosInt(pos: int) -> bool:
+    def checkPosInt(pos: int) -> bool:
         if not(0<=pos and pos <=100):
                 return False
         
