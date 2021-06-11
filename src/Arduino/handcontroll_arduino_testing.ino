@@ -15,7 +15,7 @@ void servo_do(){
 
   Transfer.rxObj(marray);
 
-  pos = map(marray[0],0,100,0,180)
+  int pos = map(marray[0],0,100,0,180);
 
   servo1.write(marray[0]);
 
