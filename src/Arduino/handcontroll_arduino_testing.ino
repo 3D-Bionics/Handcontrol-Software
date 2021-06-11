@@ -1,23 +1,52 @@
 #include "SerialTransfer.h"
 #include "Servo.h"
 
-//Defining Globals
 
-Servo servo1;
+// Servo Class
+
+class ServoControl {
+
+  Servo servo1;
+  
+  public:
+
+    ServoControl(){
+      servo1.attach(9);
+      servo1.write(20);
+    };
+
+    virtual ~ServoControl(){
+      servo1.detach();
+    };
+
+    bool SetPosition(const uint32_t positions[]) {
+      
+      servo1.write(mapPos(positions[0]));
+      return true;
+    };
+
+      
+    uint32_t mapPos(const uint32_t &pos){
+      return map(pos,0,100,0,180);
+    };
+
+};
+
+// Defining Globals
 
 SerialTransfer Transfer;
 
+ServoControl* Control;
+
 uint32_t marray[5];
 
-//Defining Callbacks
+// Defining Callbacks
 
 void servo_do(){
 
   Transfer.rxObj(marray);
 
-  int pos = map(marray[0],0,100,0,180);
-
-  servo1.write(marray[0]);
+  Control->SetPosition(marray);
 
   Transfer.sendDatum(marray);
     
@@ -31,8 +60,8 @@ const functionPtr callbackArr[] = {servo_do};
 
 void setup()
 {
-    servo1.attach(9);
-    servo1.write(0);
+
+    Control = new ServoControl;
 
     //Communicaion Stuff
     Serial.begin(115200);
