@@ -53,7 +53,7 @@ Der Arduino (und damit die Servos) kann theoretisch auch über Buttons welche di
 
 - **UI:** User-Interface der Kontroll-App
 
-- **Communication-Framework: ** Framework, welches die Kommunikation der Positionen der einzelnen Finger zwischen der Kontroll-Software und dem Arduino regelt. Es legt die Grundstruktur und unterliegende Protokolle fest.
+- **Communication-Framework, Comframe, COM: ** Framework, welches die Kommunikation der Positionen der einzelnen Finger zwischen der Kontroll-Software und dem Arduino regelt. Es legt die Grundstruktur und unterliegende Protokolle fest.
 
 
 
