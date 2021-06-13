@@ -55,3 +55,36 @@ Der Arduino (und damit die Servos) kann theoretisch auch über Buttons welche di
 
 - **Communication-Framework: ** Framework, welches die Kommunikation der Positionen der einzelnen Finger zwischen der Kontroll-Software und dem Arduino regelt. Es legt die Grundstruktur und unterliegende Protokolle fest.
 
+
+
+# Use Cases
+
+### Einzelne Ansteuerung eines Fingers über die Kontroll Software
+
+```mermaid
+flowchart LR
+a[UI zeigt Fingerposition] --> b(Auswahl neuer Position) --> c[Finger bewegt sich<br> zu neuer Position]
+```
+
+### Ansteuerung der ganzen Hand über die Kontroll Software
+
+```mermaid
+flowchart LR
+a[UI zeigt<br>vorprogrammierte Hand Positionen] --> b(AuswahlPosition) --> d[Finger bewegen sich<br> zu neuen Positionen]
+```
+
+### Ablauf einer Animation (mit Loop) über die Kontroll Software
+
+```mermaid
+flowchart LR
+a[UI zeigt vorprogrammierte<br> Hand Animationen] --> b(Auswahl Position) --> loop(Auswahl ob Loop) 
+loop -->|Nein| d[Finger bewegen sich<br> einmal wie in der<br> Animation beschrieben]
+loop -->|Ja| e[Die Animation wird<br> kontinuirlich dargestellt]
+```
+
+### Festlegen einer vorprogrammierten Position oder Animation über Hardware-Button
+
+```mermaid
+flowchart LR
+a(Hardware-Button wird gedrückt) --> b[Abspielen der nächsten<br> Position oder Animation<br> im Speicher des Arduino] --> d[Finger bewegen sich<br> zu neuen Positionen] --> e[Senden der neuen Position<br> an Kontroll-Software<br> wenn vorhanden / erreichbar]
+```
