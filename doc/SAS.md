@@ -49,7 +49,7 @@ Von diesem Dokument aus wird die Architektur und Implementierung für die Softwa
 
 - **Animation:** Eine Animation beschreibt eine Abfolge von mehreren Positionen der Finger um eine bestimmten Bewegungsablauf der Hand darzustellen.
 
-- **Kontroll-App:** Applikation über welche die Hand gesteuert werden kann
+- **Kontroll-App, Kontroll-Software:** Applikation über welche die Hand gesteuert werden kann
 
 - **UI, Userinterface:** User-Interface der Kontroll-App
 
@@ -61,13 +61,13 @@ Von diesem Dokument aus wird die Architektur und Implementierung für die Softwa
 
 Das SAS ist in 5 Teile untergliedert:
 
-Innerhalb von [**Ziele und Beschränkungen**](#Ziele und Beschränkungen) werden die einzelnen Funktionsanforderungen beschrieben und unter welchen Beschränkungen die Implementierung dieser geschehen muss.
+Innerhalb von [**Ziele und Beschränkungen**](#"Ziele und Beschränkungen") werden die einzelnen Funktionsanforderungen beschrieben und unter welchen Beschränkungen die Implementierung dieser geschehen muss.
 
-Der [**Use-Case**](#Use-Case) View gibt einen Überblick über die tatsächliche Funktion des Programms anhand von verschiedenen Use-Cases. ==Diese sind grundgebend für den restlichen Ablauf des SAS. Ebenfalls werden die Module benannt welche für die jeweilige Funktion verantwortlich sind.==
+Der [**Use-Case View**](#Use-Case)  gibt einen Überblick über die tatsächliche Funktion des Programms anhand von verschiedenen Use-Cases. ==Diese sind grundgebend für den restlichen Ablauf des SAS. Ebenfalls werden die Module benannt welche für die jeweilige Funktion verantwortlich sind.==
 
-Im [**System Architektur Überblick**](#System Architektur Überblick) wird ein grober Überblick über die Grundfunktionen und -Ideen sowie Aufbau des Projektes gegeben. Es wir sowohl die Hardware-Software-Beziehung beschrieben sowie der konzeptionelle Aufbau der Kontroll-Software
+Im [**System Architektur Überblick**](#"System Architektur Überblick") wird ein grober Überblick über die Grundfunktionen und -Ideen sowie Aufbau des Projektes gegeben. Es wir sowohl die Hardware-Software-Beziehung beschrieben sowie der konzeptionelle Aufbau der Kontroll-Software
 
-Der [**Logical View**](#Logical View) teilt dass Programm in Module auf und beschreibt dessen Funktionen und die Verbindungen zwischen den einzelnen Modulen welche auch als Grundlage für die Implementierung dienen. Des Weiteren werden auch die wichtigsten Klassen genauer beschrieben sowie die Verwendung der verschiedenen Libraries erläutert.
+Der [**Logical View**](#"Logical View") teilt dass Programm in Module auf und beschreibt dessen Funktionen und die Verbindungen zwischen den einzelnen Modulen welche auch als Grundlage für die Implementierung dienen. Des Weiteren werden auch die wichtigsten Klassen genauer beschrieben sowie die Verwendung der verschiedenen Libraries erläutert.
 
 Der Punkt [**Implementierung**](#Implementierung) beschreibt die Grundstruktur des Programmcodes und die zugrundeliegenden Konventionen. Außerdem wird gezeigt, wie sich die Programmfunktionen in einzelne Programmcode-Module aufteilen.
 
@@ -184,6 +184,17 @@ Zuständig für:
 #### Übersicht
 
 ```mermaid
+graph TD
+
+COM[<b>Communication Framework] .->|Defines| A_COM(Arduino-COM) & KS_COM(Kontroll-COM)
+Hand[Hand-Modell] --- vorPos(Vorgefertigte Positionen)
+Hard[<b>Hardware] --- scontrol(Servo Controller)
+KS[<b>Kontroll-Software] --- term(Terminal User<br> Interface)
+
+A_COM ---|for| Hard
+KS_COM ---|for| KS
+COM .->|Uses| Hand
+
 
 ```
 
@@ -199,6 +210,16 @@ Das Modul Communication-Framework beschreibt das Framework konzeptionell und leg
 
 Das Modul **Hand-Modell** beschreibt die interne Repräsentation der Hand für die Kontroll-Software. Es dient außerdem als Basis für das gesendete Format des Hand-Modells für das Communication-Framework.
 
+#### Vorgefertigte Positionen
+
+Nach `SRS FA 3.1.2: Vorgefertigte Positionen` 
+
+Das Submodul legt das Format für Repräsentation und Speicherung von vorgefertigten Positionen sowie für Animationen fest.
+
+##### Schere Stein Papier
+
+Nach `SRS FA 3.1.2.1: Schere Stein Papier`
+
 ### Hardware
 
 Das Modul **Hardware** beschreibt alle Funktionalitäten welche direkt mit der Hardware zu tun haben. Dazu zählt zum einen die Programmierung des Arduinos sowohl die dafür benötigten Klassen zur Kontrolle der Servos (Submodul [Servo-Controller](#Servo-Controller)) sowie die Kommunikation zur Kontroll-Software (Submodul [Arduino-Com](#Arduino-COM)) 
@@ -212,6 +233,8 @@ Das Submodul **Servo-Controller** beschreibt die gleichnamige Klasse *ServoContr
 Das Submodul **Arduino-COM** ist die Implementierung des [Communication-Frameworks](#Communication-Framework) auf dem Arduino.
 
 ### Kontroll-Software
+
+Nach `SRS FA 3.1.3: Graphische Benutzeroberfläche`
 
 #### Terminal User Interface
 
@@ -227,7 +250,9 @@ Das Submodul **Kontroll-COM** ist die Implementierung des [Communication-Framewo
 
 ---
 
-## Hand-Modell
+## Modul: Hand-Modell
+
+### Interne Repräsentation der Hand
 
 Die Hand wird software-intern als die Position der fünf einzelnen Finger dargestellt.
 
@@ -236,11 +261,14 @@ Die Streckung der Finger wird als eine Prozent-Angabe repräsentiert wobei 0% f�
 #### Eigenschaften
 
 - **Format: ** `[Position kF, Position rF, ...]` 
-
 - Die Reihenfolge innerhalb des Arrays ist **kF, rF, mF, zF, dF**
 
+### Vorgefertigte Positionen
 
-## Communication-Framework
+
+
+
+## Modul: Communication-Framework
 
 > Das Communication-Framework oder auch COM ist dafür zuständig die Positionen der einzelnen Finger zwischen der Kontroll-Software und dem Arduino zu managen. Es regelt die Kommunikation über die serielle Schnittstelle und legt das Protokoll der Übertragung fest.
 >
@@ -248,18 +276,18 @@ Die Streckung der Finger wird als eine Prozent-Angabe repräsentiert wobei 0% f�
 
 ### Aufgaben nach SRS
 
-- Positionen der einzelnen Finger über die Kontroll-Software an den Arduino weitergeben
-- Komplexere Positionsabläufe über die Kontroll-Software an den Arduino weitergeben
-- Das interne Hand-Modell mit Positions-Updates des Arduinos zu aktualisieren
-- Automatisches Aufbauen einer Verbindung mit dem Arduino
+- Positionen der einzelnen Finger über die Kontroll-Software an den Arduino weitergeben `SRS 3.1.1`
+- Komplexere Positionsabläufe über die Kontroll-Software an den Arduino weitergeben `SRS 3.1.2`
+- Das interne Hand-Modell mit Positions-Updates des Arduinos zu aktualisieren `SRS 3.1.3`
+- Automatisches Aufbauen einer Verbindung mit dem Arduino über eine serielle Verbindung `SRS 3.2.1`
 
 ### Kommunikations-Standard
 
-#### Anfoderungen
+#### Anforderungen
 
 - Die Kommunikation läuft über eine serielle Schnittstelle zwischen Kontroll-Software und Arduino.
 - Es werden nur dann Positionen gesendet wenn sich auch etwas an der Position der Finger verändert hat, oder sich etwas ändern soll
-- Gesendete Positionen sind stets im Format wie es in [Hand-Modell / Format](# Hand-Modell) beschrieben wird 
+- Gesendete Positionen sind stets im Format wie es in [Hand-Modell / Format](#"Interne Repräsentation der Hand") beschrieben wird 
 - Eine Animation ist eine Liste von hintereinander gesendeten Positionen
 - Das Communication-Framework hat eine interne Message-Queue, welche asynchron abgearbeitet werden kann. 
 
