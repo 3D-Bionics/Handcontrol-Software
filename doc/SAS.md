@@ -1,6 +1,6 @@
 ---
 title: "System Architektur Spezifikation"
-version: 0.2
+version: 0.3
 keywords: [THAB, Informatik IV, 3D-Bionics]
 
 ---
@@ -313,4 +313,117 @@ sequenceDiagram
     Kontroll-COM ->> UI: Update Position
  	
 ```
+
+## Klassen
+
+### Kontroll-Software
+
+```mermaid
+classDiagram
+class App{
+	Hand hand_object
+	COM comframe
+	MainForm MainForm
+	
+}
+
+class NPYScreenForm
+class NPYScreenWidgets
+
+class MainForm{
+	Hand hand_object
+	COM comframe
+	handlers
+	create()
+	while_waiting()
+	sendPos()
+	updatePos()
+}
+
+MainForm <|-- NPYScreenForm :Baseclass
+MainForm *-- "many"NPYScreenWidgets: has
+
+class COM {
+	<<interface>>
+	-Hand hand_object
+	-list queue
+	-SerialTransfer link
+	
+	-connect(port)
+	+reconnect(port)
+	
+	+attachHandTracker(port)
+	
+	+sendPos(positions)
+	+sendHandPos()
+	
+	+processQueue()
+	+queue_clear()
+	
+	-receivePos()
+	-receiveDebug()
+}
+
+class SerialTransfer
+COM *-- SerialTransfer
+
+class Hand {
+	list~int~ positions
+	
+	+setPos(positions) bool
+	+setFinger(position) bool
+	
+	+getPos() list~int~
+	+getFinger() int
+	
+	validatePos(positions)$ bool
+	
+}
+
+COM *-- "1" Hand
+
+App *-- "1" COM
+App *-- "1" Hand : link to object
+App *-- MainForm
+
+%%MainForm .. COM
+%%MainForm .. Hand
+```
+
+
+
+
+
+### Arduino
+
+
+
+```mermaid
+classDiagram
+	class HandControll{
+		
+	}
+	class COM{
+		
+	}
+	
+	class ServoControll{
+	<<interface>>
+		int[5] currentPosition
+		
+		+updatePos(int[5] position)
+		+getPos() position
+		
+		-setServo(int servo, int pwm)
+		-mapPosToPWM(int pos) int
+		
+	}
+	
+	ServoControll --* ServoDriver
+	HandControll ..|> COM
+	HandControll --o"1" ServoControll
+
+```
+
+
 
