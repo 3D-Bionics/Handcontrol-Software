@@ -409,10 +409,8 @@ classDiagram
 	
 	class ServoControll{
 	<<interface>>
-		int[5] currentPosition
 		
 		+updatePos(int[5] position)
-		+getPos() position
 		
 		-setServo(int servo, int pwm)
 		-mapPosToPWM(int pos) int
