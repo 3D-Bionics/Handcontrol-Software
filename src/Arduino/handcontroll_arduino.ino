@@ -1,5 +1,6 @@
-#include "SerialTransfer.h"
-#include "Servo.h"
+#include <SerialTransfer.h>
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
 
 
 #define SERVOMIN  150 // Needs modification
@@ -8,11 +9,15 @@
 // ServoController Class
 
 class ServoControl {
-  
+  private:
+     Adafruit_PWMServoDriver Servos;
   public:
 
-    ServoControl(){
-        // initilize Servos
+    ServoControl(){   // initilize Servocontrol
+        Servos = Adafruit_PWMServoDriver();
+        Servos.begin();
+        Servos.setPWMFreq(60);
+        delay(10);
     };
 
     virtual ~ServoControl(){
@@ -23,31 +28,31 @@ class ServoControl {
 
     bool updatePos(const uint32_t positions[]) {
       
-        setServo(0, mapPosToPWM( positions[0]) );
-        setServo(1, mapPosToPWM( positions[1]) );
-        setServo(2, mapPosToPWM( positions[2]) );
-        setServo(3, mapPosToPWMReverse( positions[3]) );
-        setServo(4, mapPosToPWMReverse( positions[4]) );
+        setServo(0, mapPosToPWM( positions[4]) );         //Pinkie
+        setServo(1, mapPosToPWM( positions[3]) );         //Ringfinger
+        setServo(2, mapPosToPWM( positions[2]) );         //Middlefinger
+        setServo(3, mapPosToPWMReverse( positions[1]) );  //Indexfinger
+        setServo(4, mapPosToPWMReverse( positions[0]) );  //Thumb
 
       
     };
 
     // Define how the servo is set in motion (possible envelope)
     void setServo(int servonum, int pwm ){
-  
-        
-        // Something along the lines of "myServos.setPWM(servonum, 0, pwm);"
+      Servos.setPWM(servonum, 0, pwm);
+        // Something along the lines of "myServos.setPWM(servonum, 0, pwm);
 
     }
 
     // How the Position maps to PWM
     uint32_t mapPosToPWM(uint32_t pos){
+      return map(pos,0,100,SERVOMIN,SERVOMAX);
 
     }
 
     // How the Position maps to PWM in Reverse
     uint32_t mapPosToPWMReverse(uint32_t pos){
-        
+        return map(pos,0,100,SERVOMAX,SERVOMIN);
     }
 
 };
