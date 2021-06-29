@@ -79,7 +79,7 @@ class Comframe:
         pass
 
     # Send specific position to the arduino
-    def sendPosList(self, positions: list[int]):
+    def sendPosList(self, positions):
         if hand.checkPos(positions):
             self._link.send(self._link.tx_obj(positions))
 
@@ -108,7 +108,7 @@ class Comframe:
             self._queue_counter=0
             
     # queus a list of positions into the internal queue
-    def queue_position(self,position_array: list[list[int]]):
+    def queue_position(self,position_array):
         for pos in position_array:
             self._queue.append(pos)
 
