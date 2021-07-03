@@ -1,6 +1,8 @@
 from pySerialTransfer import pySerialTransfer as transfer
 from hand_object import hand
 import time
+import threading
+from collections import deque
 
 class Comframe:
     
@@ -8,12 +10,27 @@ class Comframe:
 
         self._hand = hand
 
-        self._queue = []
-        self._queue_counter = 0
+        self._queue = deque()
+        self._queue_iter = iter(self._queue)
+
+        self.delay = 0.2
+
         self.loop = False
+        self.pause = False
 
         self._connect(port)
 
+        # Start worker thread for queue processing
+        self._worker_thread = threading.Thread(target=self._worker, daemon=True)
+        self._worker_thread.start()
+
+    def __del__(self):
+        try:
+            self._link.close()
+        except:
+            pass
+        
+    # Function for connecting to an arduino. Trys to detect possible ports manually
     def _connect(self,port = None):
         if type(port) == list:
             available_ports = port
@@ -29,7 +46,6 @@ class Comframe:
             try:
                 # Create Link
                 port = available_ports.pop()
-
                 self._link = transfer.SerialTransfer(port)
 
                 # Set Callbacks for automatic receiving and processing of packages
@@ -51,17 +67,12 @@ class Comframe:
                 pass
             
         raise Exception("No Connection")
-
+    
+    # Reconnects to an arduino at runtime either with old port or a new given port
     def reconnect(self,port = None):
         self._link.close()
         self._connect(port or self.port)
         
-    
-    def __del__(self):
-        try:
-            self._link.close()
-        except:
-            pass
 
     # Method for extending support for optional handtracker on seperate serial Port
     def attachHandTracker(self, port):
@@ -87,35 +98,41 @@ class Comframe:
     def sendPos(self):
         self._link.send(self._link.tx_obj(self._hand.getPos()))
 
-    # process all incoming packages
-    def processAll(self):
-        while(self.processOne()):
-            pass
-
-    # process one incoming package
-    def processOne(self):
-        self._link.tick()
-        
-    # process the incoming package + position queue
-
-    def processQueue(self):
-        self.processOne()
-        if self._queue_counter < len(self._queue):
-            self.sendPosList(self._queue[self._queue_counter])
-            self._queue_counter+=1
-
-        if self.loop and self._queue_counter == len(self._queue):
-            self._queue_counter=0
+    # worker function. Processes incoming packages and internal queue for sending positions.        
+    def _worker(self):
+        def nextpos():
+                nextpos = next(self._queue_iter)
+                self.sendPosList(nextpos)
             
+        while True:
+
+            # Process next incoming package
+            self._link.tick()
+
+            if(self.pause is True):
+                continue
+            
+            try:
+                nextpos()
+
+            except:
+                if(self.loop is True):
+                    self._queue_iter = iter(self._queue)
+                    nextpos()
+
+            time.sleep(self.delay)
+    
     # queus a list of positions into the internal queue
     def queue_position(self,position_array):
         for pos in position_array:
             self._queue.append(pos)
+        self._queue_iter = iter(self._queue)
 
     # clears the internal queue
     def queue_clear(self):
         self._queue.clear()
-        self._queue_counter = 0
+        self._queue_iter = iter(self._queue)
+
 
 # Gets all available Ports for serial communication
 def getOpenPorts() -> list:
