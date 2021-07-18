@@ -3,7 +3,7 @@
 #include <Adafruit_PWMServoDriver.h>
 
 
-#define SERVOMIN  150 // Needs modification
+#define SERVOMIN  150
 #define SERVOMAX  600
 
 // ServoController Class
@@ -21,9 +21,6 @@ class ServoControl {
     };
 
     virtual ~ServoControl(){
-
-        // Detach all Servos here
-
     };
 
     bool updatePos(const uint32_t positions[]) {
@@ -37,11 +34,9 @@ class ServoControl {
       
     };
 
-    // Define how the servo is set in motion (possible envelope)
+    // Define how the servo is set in motion
     void setServo(int servonum, int pwm ){
       Servos.setPWM(servonum, 0, pwm);
-        // Something along the lines of "myServos.setPWM(servonum, 0, pwm);
-
     }
 
     // How the Position maps to PWM
