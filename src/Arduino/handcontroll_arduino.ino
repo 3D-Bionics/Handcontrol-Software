@@ -2,9 +2,9 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 
-
-#define SERVOMIN  150
-#define SERVOMAX  600
+// definition of pulse timing for the PCA9685 servo controller, can be modified to accommodate different types and brands of servos
+#define SERVOMIN  150   // low-point of servo
+#define SERVOMAX  600   // high-point of servo
 
 // ServoController Class
 
