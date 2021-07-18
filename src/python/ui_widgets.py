@@ -7,7 +7,7 @@ from positions import hand_positions
 # Sliders for displaying current position of hand
 class Slider(npyscreen.SliderPercent):
     def __init__(self,screen,block_color='CAUTIONHL',*args,**keywords):
-        super(Slider,self).__init__(screen,out_of=100, step=2, editable= False, block_color=block_color ,*args,**keywords)
+        super(Slider,self).__init__(screen,out_of=100, step=5, editable= False, block_color=block_color ,*args,**keywords)
 
     def when_value_edited(self):
         self.parent.sendPos()
