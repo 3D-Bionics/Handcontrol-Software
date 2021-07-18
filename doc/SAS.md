@@ -220,6 +220,8 @@ Das Submodul legt das Format für Repräsentation und Speicherung von vorgeferti
 
 Nach `SRS FA 3.1.2.1: Schere Stein Papier`
 
+Für "Schere Stein Papier" wird eine Position zufällig ausgewählt, um mit der Hand "Schere Stein Papier" spielen zu können.
+
 ### Hardware
 
 Das Modul **Hardware** beschreibt alle Funktionalitäten welche direkt mit der Hardware zu tun haben. Dazu zählt zum einen die Programmierung des Arduinos sowohl die dafür benötigten Klassen zur Kontrolle der Servos (Submodul [Servo-Controller](#Servo-Controller)) sowie die Kommunikation zur Kontroll-Software (Submodul [Arduino-Com](#Arduino-COM)) 
@@ -263,9 +265,26 @@ Die Streckung der Finger wird als eine Prozent-Angabe repräsentiert wobei 0% f�
 - **Format: ** `[Position kF, Position rF, ...]` 
 - Die Reihenfolge innerhalb des Arrays ist **kF, rF, mF, zF, dF**
 
-### Vorgefertigte Positionen
+### Animationen
 
+Animationen werden intern als Array von Positionen (wie oben beschrieben) abgespeichert. Die Positionen werden nach einander gesendet um eine kontinuierliche Bewegung darzustellen. Das Timing zwischen den einzelnen Positionen ist abhängig von der Sende-Rate der einzelnen Positions-Updates.
 
+#### Beispiel:
+
+```python
+animation = [
+    #[position kF,rF,mF,zF,dF] Format von Positionen
+    [60, 50, 40, 30, 20],
+    [70, 60, 50, 40, 30],
+    [80, 70, 60, 50, 40],
+    [90, 80, 70, 60, 50],
+    ....
+]
+```
+
+### Speicherung von vorgefertigten Positionen
+
+Positionen oder Animationen werden zusammen mit einem Namen, innerhalb einer Map gespeichert. Die Kontroll-Software ließt diese Map aus um die Menü-Optionen zu generieren.
 
 
 ## Modul: Communication-Framework
@@ -279,7 +298,7 @@ Die Streckung der Finger wird als eine Prozent-Angabe repräsentiert wobei 0% f�
 - Positionen der einzelnen Finger über die Kontroll-Software an den Arduino weitergeben `SRS 3.1.1`
 - Komplexere Positionsabläufe über die Kontroll-Software an den Arduino weitergeben `SRS 3.1.2`
 - Das interne Hand-Modell mit Positions-Updates des Arduinos zu aktualisieren `SRS 3.1.3`
-- Automatisches Aufbauen einer Verbindung mit dem Arduino über eine serielle Verbindung `SRS 3.2.1`
+- Automatisches Aufbauen einer Verbindung zwischen Kontroll-Software und Arduino über eine serielle Verbindung `SRS 3.2.1`
 
 ### Kommunikations-Standard
 
@@ -403,9 +422,6 @@ classDiagram
 	class HandControll{
 		
 	}
-	class COM{
-		
-	}
 	
 	class ServoControll{
 	<<interface>>
@@ -418,7 +434,6 @@ classDiagram
 	}
 	
 	ServoControll --* ServoDriver
-	HandControll ..|> COM
 	HandControll --o"1" ServoControll
 
 ```

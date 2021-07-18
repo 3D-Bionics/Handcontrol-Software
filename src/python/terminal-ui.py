@@ -3,14 +3,14 @@ import curses.ascii
 from curses import endwin
 from hand_object import hand
 from communication_framework import Comframe, getOpenPorts
-from ui_widgets import TSlider, BoxSelectOne, BoxOptions, PortBox
+from ui_widgets import TSlider, TimeSlider, BoxSelectOne, BoxOptions, PortBox
 
 class MainForm(npyscreen.FormBaseNew):
-    DEFAULT_LINES = 22
+    DEFAULT_LINES = 26
 
     def create(self):
         # Init Form and Objects
-        self.name = "3D-Bionics Hand Controll Software"
+        self.name = "3D-Bionics Hand Control Software"
 
         self.comframe = self.parentApp.comframe
         self.hand = self.parentApp.hand
@@ -31,13 +31,19 @@ class MainForm(npyscreen.FormBaseNew):
         self.nextrely +=1
         self.daumen = self.add(TSlider, max_width=left, name = "Daumen")
 
+        self.nextrely += 3
+        self.timeslider = self.add(TimeSlider, max_width=round(left/1.5), value=0.3, name = "Delay", hidden = True)
 
-        self.ports = self.add(PortBox,rely=y-3,max_width=left)
+        self.nextrely = y-3
+        self.ports = self.add(PortBox,max_width=left)
 
+        self.nextrelx = left + 10
         self.nextrely = 2
-        self.quickPos = self.add(BoxSelectOne, relx = left + 10, max_height= round((y-2)/2), name = "Quick Positions")
-        self.nextrely += 2
-        self.button_loop = self.add(BoxOptions, relx= left +10)
+        self.quickPos = self.add(BoxSelectOne, max_height= round((y-2)/2), name = "Quick Positions")
+        self.nextrely += 1
+        self.reloadPos = self.add(npyscreen.ButtonPress, name="Nochmal!", relx=self.nextrelx+15, when_pressed_function = lambda : self.quickPos.entry_widget.setPosition() )
+        self.nextrely += 1
+        self.options = self.add(BoxOptions)
 
         # init handlers
 
@@ -56,7 +62,6 @@ class MainForm(npyscreen.FormBaseNew):
         self.parentApp.setNextForm(None)
 
     def while_waiting(self):
-        self.comframe.processQueue()
         self.updatePos()
 
 
@@ -74,7 +79,8 @@ class MainForm(npyscreen.FormBaseNew):
         self.comframe.queue_position(new_pos)
         
 
-     
+    def reloadQuickPos(self):
+        self.quickPos.entry_widget.setPosition()
 
     def updatePos(self):
         self.klein.set_value(self.hand.getKlein())
